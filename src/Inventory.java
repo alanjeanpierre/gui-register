@@ -47,11 +47,16 @@ public class Inventory {
 		return null;
 	}
 	
+	public LinkedList<Item> getList() {
+		return items;
+	}
+	
 	public void updateInventory(LinkedList<Item> cart) {
 		for (Item tempC : cart) {
 			for (Item tempI: items) {
 				if (tempC.getName().equals(tempI.getName())) {
 					tempI.addQuantity(-tempC.getQuant());
+					tempI.setPrice(tempC.getPrice());
 				}
 			}
 		}
