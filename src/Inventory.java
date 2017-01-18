@@ -51,6 +51,19 @@ public class Inventory {
 		return items;
 	}
 	
+	public Item checkCart(LinkedList<Item> cart) {
+		for (Item c : cart) {
+			for (Item i : items) {
+				if (i.getName().equals(c.getName())) {
+					if (i.getQuant() - c.getQuant() < 0)
+						return c;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	public void updateInventory(LinkedList<Item> cart) {
 		for (Item tempC : cart) {
 			for (Item tempI: items) {

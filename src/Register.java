@@ -528,6 +528,15 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
+				//check for over-items				
+				Item c = inventory.checkCart(cart);
+				
+				if (c != null) {
+					TextWindow.main(String.format("Error: not enough stock for %s", c.getName()));
+					return;
+				}
+				
+				
 				inventory.updateInventory(cart);
 				cart.clear();
 				updateCart();
