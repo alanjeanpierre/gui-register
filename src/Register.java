@@ -53,6 +53,8 @@ public class Register {
 	private LinkedList<Item> cart = new LinkedList<Item>();
 	private Inventory inventory = new Inventory();
 	private JButton btnAddStock;
+	
+	
 
 
 	/**

@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JCheckBox;
 
 public class AddStock {
 
@@ -52,6 +53,8 @@ public class AddStock {
 	private JTextField monsterPrice;
 	private JTextField mexicanCokePrice;
 	private JTextField redBullPrice;
+	private JLabel lblReset;
+	private JCheckBox chckbxResetInv;
 
 	/**
 	 * Launch the application.
@@ -554,6 +557,20 @@ public class AddStock {
 		frame.getContentPane().add(txtRedBull, gbc_txtRedBull);
 		txtRedBull.setColumns(10);
 		
+		lblReset = new JLabel("Reset");
+		GridBagConstraints gbc_lblReset = new GridBagConstraints();
+		gbc_lblReset.insets = new Insets(0, 0, 5, 5);
+		gbc_lblReset.gridx = 0;
+		gbc_lblReset.gridy = 20;
+		frame.getContentPane().add(lblReset, gbc_lblReset);
+		
+		chckbxResetInv = new JCheckBox("");
+		GridBagConstraints gbc_chckbxResetInv = new GridBagConstraints();
+		gbc_chckbxResetInv.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxResetInv.gridx = 1;
+		gbc_chckbxResetInv.gridy = 20;
+		frame.getContentPane().add(chckbxResetInv, gbc_chckbxResetInv);
+		
 		JLabel lblPassword = new JLabel("Password:");
 		GridBagConstraints gbc_lblPassword = new GridBagConstraints();
 		gbc_lblPassword.anchor = GridBagConstraints.EAST;
@@ -623,7 +640,13 @@ public class AddStock {
 
 					
 						
-					
+					if (chckbxResetInv.isSelected()) {
+						inventory.setInventory(newStock);
+					}
+					else {
+						inventory.updateInventory(newStock);
+					}
+						
 					inventory.updateInventory(newStock);
 					inventory.updateCSV();
 					
