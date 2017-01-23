@@ -37,7 +37,7 @@ public class AddStock {
 	private JTextField txtRedBull;
 	private JPasswordField pwdPassword;
 	
-	Inventory inventory;
+	private Inventory inventory;
 	private JTextField chipsPrice;
 	private JTextField bakedChipsPrice;
 	private JTextField snickersPrice;

@@ -50,9 +50,12 @@ public class Register {
 	private JButton btnCrackers;
 	private JTextField txtTotal;
 	
-	private LinkedList<Item> cart = new LinkedList<Item>();
-	private Inventory inventory = new Inventory();
+	//private LinkedList<Item> cart = new LinkedList<Item>();
+	private Inventory inventory = new Inventory("inventory.csv");
 	private JButton btnAddStock;
+	private JTextField txtUsername;
+	private Inventory testCart = new Inventory();
+	private String users[] = {"alan", "kasai", "ruben", "sam", "patrick", "jessica"};
 	
 	
 
@@ -74,99 +77,51 @@ public class Register {
 		
 	}
 	
-	private void updateCart() {
+	private Boolean checkUser(String username, String users[]) {
 		
-		double total = 0;
-		txtrCart.setText("");
-		
-		for (int i = 0; i < cart.size(); i++)
-		{
-			Item current = cart.get(i);
-			
-			double subtotal = current.getPrice() * current.getQuant();
-			
-			total += subtotal;
-			
-			String item = String.format("%-24s    %.2f", current.getName(), current.getPrice());// * %d = %.2f", current.getName(), current.getPrice(), current.getQuant(), subtotal); 
-			
-			if (txtrCart.getText() == "")
-			{
-				txtrCart.setText(item + "\n");
-			}
-			else {
-				txtrCart.append(item + "\n");
+		for (String user : users) {
+			if (username.equals(user)) {
+				return true;
 			}
 		}
-
-		txtTotal.setText(String.format("$%.2f", total));
+		
+		return false;
+	}
+	
+	private void updateCart() {
+		
+		
+		txtTotal.setText(String.format("$%.2f",  testCart.getTotal()));
+		txtrCart.setText(testCart.print());
 		
 	}
 	
 	private void updateHoverText() {
 		
-		Item temp;
-		String text;
 		
-		//inventory = new Inventory();
+		JButton test[] = { btnRedBull, btnChips, btnWater, btnBakedChips, 
+				btnCoke, btnSnickers, btnSprite, btnPoptarts, btnFanta, 
+				btnBurritos, btnCaprisun, btnGranolaBars, btnMonster, 
+				btnMexicanCoke, btnCrackers};
 		
-
-		temp = inventory.getItem(btnBakedChips.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnBakedChips.setToolTipText(text);		
-
-		temp = inventory.getItem(btnBurritos.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnBurritos.setToolTipText(text);		
-
-		temp = inventory.getItem(btnCaprisun.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnCaprisun.setToolTipText(text);		
-
-		temp = inventory.getItem(btnChips.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnChips.setToolTipText(text);
-		
-		temp = inventory.getItem(btnCoke.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnCoke.setToolTipText(text);		
-
-		temp = inventory.getItem(btnCrackers.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnCrackers.setToolTipText(text);		
-
-		temp = inventory.getItem(btnGranolaBars.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnGranolaBars.setToolTipText(text);		
-
-		temp = inventory.getItem(btnMonster.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnMonster.setToolTipText(text);		
-
-		temp = inventory.getItem(btnMexicanCoke.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnMexicanCoke.setToolTipText(text);		
-
-		temp = inventory.getItem(btnPoptarts.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnPoptarts.setToolTipText(text);		
-
-		temp = inventory.getItem(btnRedBull.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnRedBull.setToolTipText(text);		
-
-		temp = inventory.getItem(btnSnickers.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnSnickers.setToolTipText(text);		
-
-		temp = inventory.getItem(btnSprite.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnSprite.setToolTipText(text);		
-
-		temp = inventory.getItem(btnWater.getText());
-		text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
-		btnWater.setToolTipText(text);
-
+		for (JButton i : test) {
+			Item temp = inventory.getItem(i.getText());
+			String text = String.format("<html>%s<br>%.2f each<br>%d remaining</html>", temp.getName(), temp.getPrice(), temp.getQuant());
+			i.setToolTipText(text);
+		}
 	}
+	
+	private void addToCart(String name) {
+		
+		Item temp = inventory.getItem(name);
+		temp.singleQuantity();
+		
+		//cart.add(temp);
+		testCart.addItem(temp);
+		
+		updateCart();
+	}
+/*
 
 	/**
 	 * Create the application.
@@ -201,12 +156,8 @@ public class Register {
 		btnChips.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Item temp = inventory.getItem(btnChips.getText());
-				temp.singleQuantity();
 				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnChips.getText());
 				
 			}
 		});
@@ -221,12 +172,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnWater.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnWater.getText());
 			}
 		});
 		GridBagConstraints gbc_btnWater = new GridBagConstraints();
@@ -240,12 +186,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnBakedChips.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnBakedChips.getText());
 			}
 		});
 		GridBagConstraints gbc_btnBakedChips = new GridBagConstraints();
@@ -259,12 +200,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnCoke.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnCoke.getText());
 			}
 		});
 		GridBagConstraints gbc_btnCoke = new GridBagConstraints();
@@ -278,13 +214,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 			
-
-				Item temp = inventory.getItem(btnSnickers.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnSnickers.getText());
 			}
 		});
 		GridBagConstraints gbc_btnSnickers = new GridBagConstraints();
@@ -298,12 +228,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnSprite.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnSnickers.getText());
 			}
 		});
 		GridBagConstraints gbc_btnSprite = new GridBagConstraints();
@@ -317,12 +242,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnPoptarts.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnPoptarts.getText());
 			}
 		});
 		GridBagConstraints gbc_btnPoptarts = new GridBagConstraints();
@@ -336,12 +256,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnFanta.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnFanta.getText());
 			}
 		});
 		GridBagConstraints gbc_btnFanta = new GridBagConstraints();
@@ -354,13 +269,8 @@ public class Register {
 		btnBurritos.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
-				Item temp = inventory.getItem(btnBurritos.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+
+				addToCart(btnBurritos.getText());
 			}
 		});
 		GridBagConstraints gbc_btnBurritos = new GridBagConstraints();
@@ -374,12 +284,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnCaprisun.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnCaprisun.getText());
 			}
 		});
 		GridBagConstraints gbc_btnCaprisun = new GridBagConstraints();
@@ -393,12 +298,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnGranolaBars.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnGranolaBars.getText());
 			}
 		});
 		GridBagConstraints gbc_btnGranolaBars = new GridBagConstraints();
@@ -411,13 +311,8 @@ public class Register {
 		btnMonster.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
-				Item temp = inventory.getItem(btnMonster.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+
+				addToCart(btnMonster.getText());
 			}
 		});
 		GridBagConstraints gbc_btnMonster = new GridBagConstraints();
@@ -431,12 +326,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnCrackers.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnCrackers.getText());
 			}
 		});
 		GridBagConstraints gbc_btnCrackers = new GridBagConstraints();
@@ -450,12 +340,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				Item temp = inventory.getItem(btnMexicanCoke.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+				addToCart(btnMexicanCoke.getText());
 			}
 		});
 		GridBagConstraints gbc_btnMexicanCoke = new GridBagConstraints();
@@ -468,13 +353,8 @@ public class Register {
 		btnRedBull.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
-				Item temp = inventory.getItem(btnRedBull.getText());
-				temp.singleQuantity();
-				
-				cart.add(temp);
-				
-				updateCart();
+
+				addToCart(btnRedBull.getText());
 			}
 		});
 		GridBagConstraints gbc_btnRedBull = new GridBagConstraints();
@@ -488,7 +368,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
-				cart.clear();
+				testCart.clear();
 				updateCart();
 				
 				AddStock.main(inventory);
@@ -500,14 +380,30 @@ public class Register {
 		gbc_btnAddStock.gridy = 9;
 		frmPartsBinRegister.getContentPane().add(btnAddStock, gbc_btnAddStock);
 		
+		txtUsername = new JTextField();
+		txtUsername.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtUsername.setText("");
+			}
+		});
+		txtUsername.setText("username");
+		GridBagConstraints gbc_txtUsername = new GridBagConstraints();
+		gbc_txtUsername.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtUsername.insets = new Insets(0, 0, 5, 5);
+		gbc_txtUsername.gridx = 0;
+		gbc_txtUsername.gridy = 10;
+		frmPartsBinRegister.getContentPane().add(txtUsername, gbc_txtUsername);
+		txtUsername.setColumns(10);
+		
 		txtTotal = new JTextField();
-		txtTotal.setText("0.00");
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 0);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 3;
-		gbc_textField.gridy = 10;
-		frmPartsBinRegister.getContentPane().add(txtTotal, gbc_textField);
+		txtTotal.setText("$0.00");
+		GridBagConstraints gbc_txtTotal = new GridBagConstraints();
+		gbc_txtTotal.insets = new Insets(0, 0, 5, 0);
+		gbc_txtTotal.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtTotal.gridx = 3;
+		gbc_txtTotal.gridy = 10;
+		frmPartsBinRegister.getContentPane().add(txtTotal, gbc_txtTotal);
 		txtTotal.setColumns(10);
 		
 		btnCancel = new JButton("Cancel");
@@ -515,7 +411,7 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
-				cart.clear();
+				testCart.clear();
 				updateCart();
 			}
 		});
@@ -529,21 +425,26 @@ public class Register {
 		btnPurchase.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				
-				//check for over-items				
-				Item c = inventory.checkCart(cart);
-				
-				if (c != null) {
-					TextWindow.main(String.format("Error: not enough stock for %s", c.getName()));
-					return;
+				if (checkUser(txtUsername.getText(), users)) {
+					
+					Item c = inventory.checkCart(testCart.getList());
+					
+					if (c != null) {
+						TextWindow.main(String.format("Error: not enough stock for %s", c.getName()));
+						return;
+					}
+					
+					
+					inventory.updateInventory(testCart.getList());
+					testCart.clear();
+					updateCart();
+					inventory.updateCSV();
+					updateHoverText();
+				}
+				else {
+					TextWindow.main("Invalid user");
 				}
 				
-				
-				inventory.updateInventory(cart);
-				cart.clear();
-				updateCart();
-				inventory.updateCSV();
-				updateHoverText();
 			}
 		});
 		GridBagConstraints gbc_btnPurchase = new GridBagConstraints();
