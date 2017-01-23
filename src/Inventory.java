@@ -6,13 +6,17 @@ import java.util.*;
 
 public class Inventory {
 
-	private LinkedList<Item> items = new LinkedList<Item>();
+	private LinkedList<Item> items;
 	
-	public Inventory() {
+	public Inventory () {
+		items = new LinkedList<Item>();
+	}
+	
+	public Inventory(String file) {
 		Scanner scanner = null;
 		
 		try {
-		    scanner = new Scanner(new File("inventory.csv"));
+		    scanner = new Scanner(new File(file));
 		} catch (Exception FileNotFoundException) {
 		    System.err.println("failed to open inventory.csv");
 		    System.exit(1);
@@ -21,6 +25,8 @@ public class Inventory {
 		
 		in.nextLine();
 		in.nextLine();
+		
+		items = new LinkedList<Item>();
 		
 		while (in.hasNext()){
 			String name = in.next();
@@ -34,6 +40,30 @@ public class Inventory {
 		
 		scanner.close();
 		in.close();
+	}
+	
+	public void addItem(String name, double price) {
+		for (Item temp: items) {
+			if (temp.getName().equals(name)) {
+				temp.addQuantity(1);
+				return;
+			}
+		}
+		
+		items.add(new Item(1, price, name));
+		
+	}
+	
+	public void addItem(Item item) {
+		for (Item temp: items) {
+			if (temp.getName().equals(item.getName())) {
+				temp.addQuantity(1);
+				return;
+			}
+		}
+		
+		items.add(item);
+		
 	}
 	
 	public Item getItem(String name) {
@@ -51,7 +81,11 @@ public class Inventory {
 		return items;
 	}
 	
-	public Item checkCart(LinkedList<Item> cart) {
+	public void setInventory(LinkedList<Item> cart) {
+		items = cart;
+	}
+	
+	public Item checkCart(LinkedList<Item> cart) {		
 		for (Item c : cart) {
 			for (Item i : items) {
 				if (i.getName().equals(c.getName())) {
@@ -75,10 +109,34 @@ public class Inventory {
 		}
 	}
 	
+	public void clear() {
+		items.clear();
+	}
+	
+	public double getTotal() {
+		double total = 0;
+		
+		for (Item temp :items) {
+			total += temp.getPrice() * temp.getQuant();
+		}
+		
+		return total;
+	}
+	
+	public String print() {
+		String str = new String();
+		
+		for (Item temp : items) {
+			str = str.concat(String.format("%-15s %d@$%.2f  %.2f\n", temp.getName(), temp.getQuant(), temp.getPrice(), temp.getQuant()*temp.getPrice()));
+		}
+
+		return str;
+	}
+	
 	public void updateCSV() {
 		try{
 		    PrintWriter writer = new PrintWriter("inventory.csv");
-		    writer.println("﻿Inventory,,");
+		    writer.println("Inventory,,");
 		    writer.println("name,price,quantity");
 		    for (int i = 0; i < items.size(); i++) {
 		    	Item temp = items.get(i);

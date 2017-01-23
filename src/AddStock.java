@@ -633,7 +633,15 @@ public class AddStock {
 					};
 
 					for (int i = 0; i < quants.length; i++) {
-						int quant = -Integer.parseInt(quants[i].getText());
+						
+						int quant;
+						
+						if (chckbxResetInv.isSelected()) {
+							quant = Integer.parseInt(quants[i].getText());
+						}
+						else {
+							quant = -Integer.parseInt(quants[i].getText());
+						}
 						double price = Double.parseDouble(prices[i].getText());
 						newStock.add(new Item(quant, price, names[i]));
 					}
@@ -647,7 +655,7 @@ public class AddStock {
 						inventory.updateInventory(newStock);
 					}
 						
-					inventory.updateInventory(newStock);
+					//inventory.updateInventory(newStock);
 					inventory.updateCSV();
 					
 					
