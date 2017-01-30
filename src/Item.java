@@ -1,16 +1,26 @@
 
 public class Item {
 
-	int quantity;
-	double price;
-	String name;
+	private int quantity;
+	private double price;
+	private String name;
 	
+	/**
+	 * constructing from a list of parameters
+	 * @param quantity
+	 * @param price
+	 * @param name
+	 */
 	public Item(int quantity, double price, String name) {
 		this.quantity = quantity;
 		this.price = price;
 		this.name = name;
 	}
 	
+	/**
+	 * cloning from an existing item
+	 * @param clone
+	 */
 	public Item(Item clone) {
 		this.quantity = clone.getQuant();
 		this.price = clone.getPrice();

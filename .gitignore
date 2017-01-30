@@ -46,10 +46,4 @@ Network Trash Folder
 Temporary Items
 .apdisk
 release/inventory.csv
-bin/Register$*
-bin/AddStock$*
-bin/Logger$*
-bin/TextWindow$*
-bin/Item$*
-bin/Inventory$*
 log.csv
