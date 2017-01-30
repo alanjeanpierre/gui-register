@@ -610,6 +610,7 @@ public class AddStock {
 				if (Arrays.equals(p, pwdPassword.getPassword())) {
 					
 					LinkedList<Item> newStock = new LinkedList<Item>();
+					Inventory newStock2 = new Inventory();
 					
 					String names[] = {
 							"Chips", "Baked Chips", "Snickers", "Pop Tarts",
@@ -644,15 +645,16 @@ public class AddStock {
 						}
 						double price = Double.parseDouble(prices[i].getText());
 						newStock.add(new Item(quant, price, names[i]));
+						newStock2.addItem(new Item(quant, price, names[i]));
 					}
 
 					
 						
 					if (chckbxResetInv.isSelected()) {
-						inventory.setInventory(newStock);
+						inventory.setInventory(newStock2);
 					}
 					else {
-						inventory.updateInventory(newStock);
+						inventory.updateInventory(newStock2);
 					}
 						
 					//inventory.updateInventory(newStock);

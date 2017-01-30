@@ -427,7 +427,7 @@ public class Register {
 			public void mouseClicked(MouseEvent e) {
 				if (checkUser(txtUsername.getText(), users)) {
 					
-					Item c = inventory.checkCart(testCart.getList());
+					Item c = inventory.checkCart(testCart);
 					
 					if (c != null) {
 						TextWindow.main(String.format("Error: not enough stock for %s", c.getName()));
@@ -435,7 +435,7 @@ public class Register {
 					}
 					
 					
-					inventory.updateInventory(testCart.getList());
+					inventory.updateInventory(testCart);
 					testCart.clear();
 					updateCart();
 					inventory.updateCSV();

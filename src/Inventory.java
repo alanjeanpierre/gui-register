@@ -6,12 +6,20 @@ import java.util.*;
 
 public class Inventory {
 
-	private LinkedList<Item> items;
+
+	private HashMap<String, Item> item2;
 	
+	/**
+	 * initializes with an empty inventory hashmap
+	 */
 	public Inventory () {
-		items = new LinkedList<Item>();
+		item2 = new HashMap<>();
 	}
 	
+	/**
+	 * loads inventory from file
+	 * @param file
+	 */
 	public Inventory(String file) {
 		Scanner scanner = null;
 		
@@ -26,7 +34,7 @@ public class Inventory {
 		in.nextLine();
 		in.nextLine();
 		
-		items = new LinkedList<Item>();
+		item2 = new HashMap<>();
 		
 		while (in.hasNext()){
 			String name = in.next();
@@ -35,88 +43,125 @@ public class Inventory {
 			double price = Double.parseDouble(sprice);
 			int quantity = Integer.parseInt(squantity);
 			Item temp = new Item(quantity, price, name);
-			items.add(temp);
+			item2.put(name, temp);
 		}
 		
 		scanner.close();
 		in.close();
 	}
 	
+	/**
+	 * adds item of single quantity to inventory
+	 * @param name
+	 * @param price
+	 */
 	public void addItem(String name, double price) {
-		for (Item temp: items) {
-			if (temp.getName().equals(name)) {
-				temp.addQuantity(1);
-				return;
-			}
-		}
 		
-		items.add(new Item(1, price, name));
+		if (item2.containsKey(name)) {
+			Item temp = item2.get(name);
+			temp.addQuantity(1);
+			item2.replace(name, temp);
+		}
+		else {
+			item2.put(name, new Item(1, price, name));
+		}
 		
 	}
 	
+	/**
+	 * adds item of the passed item to inventory
+	 * @param item
+	 */
 	public void addItem(Item item) {
-		for (Item temp: items) {
-			if (temp.getName().equals(item.getName())) {
-				temp.addQuantity(1);
-				return;
-			}
+		if (item2.containsKey(item.getName())) {
+			Item temp = item2.get(item.getName());
+			temp.addQuantity(item.getQuant());
+			item2.replace(temp.getName(), temp);
+			
+			System.out.println(item2.get(item.getName()).getQuant());
 		}
-		
-		items.add(item);
+		else {
+			item2.put(item.getName(), item);
+		}
 		
 	}
 	
+	/** returns item
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public Item getItem(String name) {
-		for (Item temp : items) {
-			if (temp.getName().equals(name))
-			{
-				return new Item(temp);
-			}
+		
+		return new Item(item2.get(name));
+		
+	}
+	
+	
+	/**
+	 * clears inventory and sets it to cart
+	 * @param cart
+	 */
+	public void setInventory(Inventory cart) {
+		item2.clear();
+		for (Item item : cart.item2.values()) {
+			item2.put(item.getName(), item);
+		}
+	}
+	
+	/**
+	 * checks to see if subtracting the cart from the inventory
+	 * will make any quantities go negative, and returns the one that does
+	 * @param cart
+	 * @return
+	 */
+
+	public Item checkCart(Inventory cart) {		
+		for (Item c : cart.item2.values()) {
+			if (item2.get(c.getName()).getQuant() - c.getQuant() < 0)
+				return c;
 		}
 		
 		return null;
 	}
 	
-	public LinkedList<Item> getList() {
-		return items;
-	}
-	
-	public void setInventory(LinkedList<Item> cart) {
-		items = cart;
-	}
-	
-	public Item checkCart(LinkedList<Item> cart) {		
-		for (Item c : cart) {
-			for (Item i : items) {
-				if (i.getName().equals(c.getName())) {
-					if (i.getQuant() - c.getQuant() < 0)
-						return c;
-				}
+	/**
+	 * updates the inventory with from the passed cart
+	 * @param cart
+	 */
+	public void updateInventory(Inventory cart) {
+		for (Item tempC : cart.item2.values()) {
+			
+			if (item2.containsKey(tempC.getName())) {
+				Item tmp = item2.get(tempC.getName());
+				
+				tmp.addQuantity(-tempC.getQuant());
+				tmp.setPrice(tempC.getPrice());
+				
+				
+				item2.replace(tmp.getName(), tmp);
+				
 			}
 		}
 		
-		return null;
 	}
 	
-	public void updateInventory(LinkedList<Item> cart) {
-		for (Item tempC : cart) {
-			for (Item tempI: items) {
-				if (tempC.getName().equals(tempI.getName())) {
-					tempI.addQuantity(-tempC.getQuant());
-					tempI.setPrice(tempC.getPrice());
-				}
-			}
-		}
-	}
-	
+	/**
+	 * clears the hashmap inventory
+	 */
 	public void clear() {
-		items.clear();
+		item2.clear();
 	}
 	
+	/**
+	 * iterates over the inevntory and returns the total price
+	 * @return
+	 */
 	public double getTotal() {
+		
 		double total = 0;
 		
-		for (Item temp :items) {
+		for (Item temp : item2.values()) {
 			total += temp.getPrice() * temp.getQuant();
 		}
 		
@@ -126,7 +171,7 @@ public class Inventory {
 	public String print() {
 		String str = new String();
 		
-		for (Item temp : items) {
+		for (Item temp : item2.values()) {
 			str = str.concat(String.format("%-15s %d@$%.2f  %.2f\n", temp.getName(), temp.getQuant(), temp.getPrice(), temp.getQuant()*temp.getPrice()));
 		}
 
@@ -138,16 +183,16 @@ public class Inventory {
 		    PrintWriter writer = new PrintWriter("inventory.csv");
 		    writer.println("Inventory,,");
 		    writer.println("name,price,quantity");
-		    for (int i = 0; i < items.size(); i++) {
-		    	Item temp = items.get(i);
+		    
+		    for (Item temp : item2.values()) {
 		    	String name = temp.getName();
 		    	String quantity = Integer.toString(temp.getQuant());
 		    	String price = Double.toString(temp.getPrice());
 		    	String out = name + "," + price + "," + quantity;
 		    	
 		    	writer.println(out);
-		    	
 		    }
+
 		    writer.close();
 		} catch (IOException e) {
 		    System.err.println("failed to open inventory.csv whyy");
