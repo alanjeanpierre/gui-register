@@ -55,16 +55,18 @@ public class AddStock {
 	private JTextField redBullPrice;
 	private JLabel lblReset;
 	private JCheckBox chckbxResetInv;
+	
+	private String user;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(Inventory inventory) {
+	public static void main(Inventory inventory, String user) {
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AddStock window = new AddStock(inventory);
+					AddStock window = new AddStock(inventory, user);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -76,7 +78,8 @@ public class AddStock {
 	/**
 	 * Create the application.
 	 */
-	public AddStock(Inventory inventory) {
+	public AddStock(Inventory inventory, String user) {
+		this.user = user;
 		this.inventory = inventory;
 		initialize();
 	}
@@ -654,7 +657,7 @@ public class AddStock {
 						inventory.setInventory(newStock2);
 					}
 					else {
-						inventory.updateInventory(newStock2);
+						inventory.updateInventory(newStock2, user, false);
 					}
 						
 					//inventory.updateInventory(newStock);
@@ -664,7 +667,7 @@ public class AddStock {
 					frame.dispose();
 				}
 				else {
-					TextWindow.main("Invalid password");
+					TextWindow.main(user, "Invalid password");
 				}
 				
 				

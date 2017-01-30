@@ -105,6 +105,8 @@ public class Inventory {
 	public void setInventory(Inventory cart) {
 		item2.clear();
 		for (Item item : cart.item2.values()) {
+
+			Logger.buy("", item);
 			item2.put(item.getName(), item);
 		}
 	}
@@ -129,8 +131,13 @@ public class Inventory {
 	 * updates the inventory with from the passed cart
 	 * @param cart
 	 */
-	public void updateInventory(Inventory cart) {
+	public void updateInventory(Inventory cart, String user, Boolean purchase) {
 		for (Item tempC : cart.item2.values()) {
+			
+			
+			if (purchase) Logger.buy(user, tempC);
+			else Logger.stock(user, tempC);
+			
 			
 			if (item2.containsKey(tempC.getName())) {
 				Item tmp = item2.get(tempC.getName());
@@ -141,6 +148,9 @@ public class Inventory {
 				
 				item2.replace(tmp.getName(), tmp);
 				
+			}
+			else{
+				item2.put(tempC.getName(), tempC);
 			}
 		}
 		

@@ -21,11 +21,11 @@ public class TextWindow {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String message) {
+	public static void main(String user, String message) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TextWindow window = new TextWindow(message);
+					TextWindow window = new TextWindow(user, message);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -37,8 +37,9 @@ public class TextWindow {
 	/**
 	 * Create the application.
 	 */
-	public TextWindow(String message) {
+	public TextWindow(String user, String message) {
 		this.message = message;
+		Logger.popup(user, message);
 		initialize();
 	}
 

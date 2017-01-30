@@ -129,6 +129,7 @@ public class Register {
 	public Register() {
 		initialize();
 		updateHoverText();
+		Logger.startup();
 	}
 
 	/**
@@ -140,6 +141,10 @@ public class Register {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
 				updateHoverText();
+			}
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				Logger.close();
 			}
 		});
 		frmPartsBinRegister.setTitle("Parts Bin Register");
@@ -368,10 +373,15 @@ public class Register {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 
-				testCart.clear();
-				updateCart();
-				
-				AddStock.main(inventory);
+				if (checkUser(txtUsername.getText(), users)) {
+					testCart.clear();
+					updateCart();
+					
+					AddStock.main(inventory, txtUsername.getText());
+				}
+				else {
+					TextWindow.main(txtUsername.getText(), "Error: Invalid User");
+				}
 			}
 		});
 		GridBagConstraints gbc_btnAddStock = new GridBagConstraints();
@@ -430,19 +440,19 @@ public class Register {
 					Item c = inventory.checkCart(testCart);
 					
 					if (c != null) {
-						TextWindow.main(String.format("Error: not enough stock for %s", c.getName()));
+						TextWindow.main(txtUsername.getText(), String.format("Error: not enough stock for %s", c.getName()));
 						return;
 					}
 					
 					
-					inventory.updateInventory(testCart);
+					inventory.updateInventory(testCart, txtUsername.getText(), true);
 					testCart.clear();
 					updateCart();
 					inventory.updateCSV();
 					updateHoverText();
 				}
 				else {
-					TextWindow.main("Invalid user");
+					TextWindow.main(txtUsername.getText(), "Error: Invalid User");
 				}
 				
 			}
