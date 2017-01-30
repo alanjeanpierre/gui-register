@@ -11,7 +11,11 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.SwingConstants;
-
+/**
+ * Creates a text window with a supplied message
+ * @author jeanp
+ *
+ */
 public class TextWindow {
 	
 	private String message;

@@ -78,7 +78,6 @@ public class Inventory {
 			temp.addQuantity(item.getQuant());
 			item2.replace(temp.getName(), temp);
 			
-			System.out.println(item2.get(item.getName()).getQuant());
 		}
 		else {
 			item2.put(item.getName(), item);
@@ -102,11 +101,12 @@ public class Inventory {
 	 * clears inventory and sets it to cart
 	 * @param cart
 	 */
-	public void setInventory(Inventory cart) {
+	public void setInventory(Inventory cart, String user) {
 		item2.clear();
+		Logger.resetStock(user);
 		for (Item item : cart.item2.values()) {
 
-			Logger.buy("", item);
+			Logger.stock(user, item, true);
 			item2.put(item.getName(), item);
 		}
 	}
@@ -135,8 +135,12 @@ public class Inventory {
 		for (Item tempC : cart.item2.values()) {
 			
 			
-			if (purchase) Logger.buy(user, tempC);
-			else Logger.stock(user, tempC);
+			if (purchase) {
+				Logger.buy(user, tempC);
+			}
+			else {
+				Logger.stock(user, tempC, false);
+			}
 			
 			
 			if (item2.containsKey(tempC.getName())) {
@@ -178,6 +182,10 @@ public class Inventory {
 		return total;
 	}
 	
+	/**
+	 * returns a cart-printing friendly string
+	 * @return
+	 */
 	public String print() {
 		String str = new String();
 		
@@ -188,6 +196,9 @@ public class Inventory {
 		return str;
 	}
 	
+	/** 
+	 * opens and updates the inventory CSV
+	 */
 	public void updateCSV() {
 		try{
 		    PrintWriter writer = new PrintWriter("inventory.csv");

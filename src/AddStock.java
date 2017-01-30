@@ -647,20 +647,18 @@ public class AddStock {
 							quant = -Integer.parseInt(quants[i].getText());
 						}
 						double price = Double.parseDouble(prices[i].getText());
-						newStock.add(new Item(quant, price, names[i]));
 						newStock2.addItem(new Item(quant, price, names[i]));
 					}
 
 					
 						
 					if (chckbxResetInv.isSelected()) {
-						inventory.setInventory(newStock2);
+						inventory.setInventory(newStock2, user);
 					}
 					else {
 						inventory.updateInventory(newStock2, user, false);
 					}
 						
-					//inventory.updateInventory(newStock);
 					inventory.updateCSV();
 					
 					

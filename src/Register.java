@@ -26,6 +26,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * main cash register application. buttons for items, cart box, etc.
+ * checks for user name
+ * @author jeanp
+ *
+ */
 public class Register {
 
 	private JFrame frmPartsBinRegister;
@@ -77,6 +83,12 @@ public class Register {
 		
 	}
 	
+	/**
+	 * checks if username is in the list of auth'd users
+	 * @param username
+	 * @param users
+	 * @return
+	 */
 	private Boolean checkUser(String username, String users[]) {
 		
 		for (String user : users) {
@@ -88,6 +100,9 @@ public class Register {
 		return false;
 	}
 	
+	/**
+	 * reprints the cart to the cart window
+	 */
 	private void updateCart() {
 		
 		
@@ -96,6 +111,11 @@ public class Register {
 		
 	}
 	
+	/**
+	 * updates the hovertext on the buttons
+	 * hovertext has name, price and quantity remaining (not counting
+	 * the amount in the current cart)
+	 */
 	private void updateHoverText() {
 		
 		
@@ -111,6 +131,10 @@ public class Register {
 		}
 	}
 	
+	/**
+	 * adds item to cart based on name
+	 * @param name
+	 */
 	private void addToCart(String name) {
 		
 		Item temp = inventory.getItem(name);
