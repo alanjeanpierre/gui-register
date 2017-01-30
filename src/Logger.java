@@ -37,7 +37,7 @@ public class Logger {
 	public static void buy(String user, Item item) {
 		try{
 		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(log),true));
-		    double sale = item.getPrice() + item.getQuant();
+		    double sale = item.getPrice() * item.getQuant();
 		    //date, user, item, quantity, price, total
 		    writer.format("%s,%s,%s,PURCHASE,%s,%s,%.2f,%.2f\n", 
 		    		LocalDate.now(), LocalTime.now(),
