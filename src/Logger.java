@@ -15,10 +15,10 @@ public class Logger {
 	 */
 	public static void startup() {
 		
-		new File(".\\logs\\").mkdir();
+		new File("logs").mkdir();
 		
 		try{
-		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    
 		    //date, time, (user), function
 		    writer.format("%s,%s,,STARTUP,\n", 
@@ -38,7 +38,7 @@ public class Logger {
 	 */
 	public static void buy(String user, Item item) {
 		try{
-		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    double sale = item.getPrice() * item.getQuant();
 		    //date, user, item, quantity, price, total
 		    writer.format("%s,%s,%s,PURCHASE,%s,%s,%.2f,%.2f\n", 
@@ -66,7 +66,7 @@ public class Logger {
 		}
 		else {
 			try{
-			    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+			    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 			    int quant = Math.abs(item.getQuant());
 			    
 			    //date, user, item, quantity, price, total
@@ -88,7 +88,7 @@ public class Logger {
 	public static void resetStock(String user) {
 
 		try{
-		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    
 		    //date, user, item, quantity, price, total
 		    writer.format("%s,%s,%s,RESETSTOCK\n", 
@@ -109,7 +109,7 @@ public class Logger {
 	public static void popup(String user, String message) {
 		
 		try{
-		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    
 		    //date, user, item, quantity, price, total
 		    writer.format("%s,%s,%s,MESSAGE,%s\n", 
@@ -128,7 +128,7 @@ public class Logger {
 	public static void close() {
 		
 		try{
-		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File(".\\logs\\" + LocalDate.now()+"-"+log),true));
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    
 		    writer.format("%s,%s,,TOTAL,%.2f\n",
 		    		LocalDate.now(), LocalTime.now(),
