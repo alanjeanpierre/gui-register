@@ -8,12 +8,15 @@ public class Inventory {
 
 
 	private HashMap<String, Item> item2;
+	private ArrayList<String> itemNames;
+	private String file;
 	
 	/**
 	 * initializes with an empty inventory hashmap
 	 */
 	public Inventory () {
 		item2 = new HashMap<>();
+		itemNames = new ArrayList<>();
 	}
 	
 	/**
@@ -21,12 +24,13 @@ public class Inventory {
 	 * @param file
 	 */
 	public Inventory(String file) {
+		this.file = file;
 		Scanner scanner = null;
 		
 		try {
 		    scanner = new Scanner(new File(file));
 		} catch (Exception FileNotFoundException) {
-		    System.err.println("failed to open inventory.csv");
+		    System.err.printf("failed to open %s\n", file);
 		    System.exit(1);
 		}
 		Scanner in = scanner.useDelimiter("[,|\n\r]+");
@@ -35,6 +39,7 @@ public class Inventory {
 		in.nextLine();
 		
 		item2 = new HashMap<>();
+		itemNames = new ArrayList<>();
 		
 		while (in.hasNext()){
 			String name = in.next();
@@ -44,7 +49,10 @@ public class Inventory {
 			int quantity = Integer.parseInt(squantity);
 			Item temp = new Item(quantity, price, name);
 			item2.put(name, temp);
+			itemNames.add(name);
 		}
+		
+		Collections.sort(itemNames);
 		
 		scanner.close();
 		in.close();
@@ -127,6 +135,10 @@ public class Inventory {
 		return null;
 	}
 	
+	public int getNumOfItems() {
+		return item2.size();
+	}
+	
 	/**
 	 * updates the inventory with from the passed cart
 	 * @param cart
@@ -182,6 +194,10 @@ public class Inventory {
 		return total;
 	}
 	
+	public String getItemName(int index) {
+		return itemNames.get(index);
+	}
+	
 	/**
 	 * returns a cart-printing friendly string
 	 * @return
@@ -201,7 +217,7 @@ public class Inventory {
 	 */
 	public void updateCSV() {
 		try{
-		    PrintWriter writer = new PrintWriter("inventory.csv");
+		    PrintWriter writer = new PrintWriter(file);
 		    writer.println("Inventory,,");
 		    writer.println("name,price,quantity");
 		    
@@ -216,7 +232,7 @@ public class Inventory {
 
 		    writer.close();
 		} catch (IOException e) {
-		    System.err.println("failed to open inventory.csv whyy");
+		    System.err.printf("failed to open %s whyy\n", file);
 		    System.exit(1);
 		}
 	}
