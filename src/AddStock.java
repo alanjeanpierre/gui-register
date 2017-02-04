@@ -74,7 +74,7 @@ public class AddStock {
 		
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, num*30, num*6);
+		frame.setBounds(100, 100, 200*num/7, 320);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[4*num/6 + 1];
@@ -199,7 +199,7 @@ public class AddStock {
 			public void mouseClicked(MouseEvent e) {
 				
 				
-				int inPwd = pwdPassword.getPassword().toString().hashCode();
+				int inPwd = String.valueOf(pwdPassword.getPassword()).hashCode();
 				
 				if (inPwd == password) {
 					
