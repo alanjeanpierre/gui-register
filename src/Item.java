@@ -1,8 +1,9 @@
+import java.math.BigDecimal;
 
 public class Item {
 
 	private int quantity;
-	private double price;
+	private BigDecimal price;
 	private String name;
 	
 	/**
@@ -13,7 +14,7 @@ public class Item {
 	 */
 	public Item(int quantity, double price, String name) {
 		this.quantity = quantity;
-		this.price = price;
+		this.price = new BigDecimal(price);
 		this.name = name;
 	}
 	
@@ -23,12 +24,12 @@ public class Item {
 	 */
 	public Item(Item clone) {
 		this.quantity = clone.getQuant();
-		this.price = clone.getPrice();
+		this.price = new BigDecimal(clone.getPrice());
 		this.name = clone.getName();
 	}
 	
 	public double getPrice () {
-		return price;
+		return price.doubleValue();
 	}
 	
 	public int getQuant() {
@@ -44,7 +45,7 @@ public class Item {
 	}
 	
 	public void setPrice(double newPrice) {
-		price = newPrice;
+		price = new BigDecimal(newPrice);
 	}
 	
 	public void addQuantity(int newStock) {
