@@ -1,9 +1,20 @@
+package logger;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.*;
 
+import model.Item;
+
+/**
+ * Logger class for the register
+ * Logs stock purchases, sales, errors, totals, and
+ * startup/shut down times
+ * @author Alan Jeanpierre
+ *
+ */
 public class Logger {
 
 	private static final String log = "log.csv";

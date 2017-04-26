@@ -1,9 +1,18 @@
+package view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+
+import model.AbstractInventory;
+import model.Cart;
+import model.Inventory;
+import model.Item;
+import model.Password;
+import model.Users;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -17,6 +26,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JCheckBox;
 
+/**
+ * All-in-one application to add stock. I'll MVC it up later
+ * @author Alan Jeanpierre
+ *
+ */
 public class AddStock {
 
 	private JFrame frame;
@@ -34,34 +48,20 @@ public class AddStock {
 	private GridBagConstraints nameConstraints[];
 	private GridBagConstraints quantConstraints[];
 	
-	private String user;
-	private int password;
+	private Users user;
+	private Password password;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(Inventory inventory, String user, int password) {
-		
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AddStock window = new AddStock(inventory, user, password);
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	
 
 	/**
 	 * Create the application.
 	 */
-	public AddStock(Inventory inventory, String user, int password) {
+	public AddStock(AbstractInventory inventory, Users users, Password password) {
 		this.password = password;
-		this.user = user;
-		this.inventory = inventory;
+		this.user = users;
+		this.inventory = (Inventory) inventory;
 		initialize();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -201,9 +201,9 @@ public class AddStock {
 				
 				int inPwd = String.valueOf(pwdPassword.getPassword()).hashCode();
 				
-				if (inPwd == password) {
+				if (password.valid(pwdPassword.getPassword())) {
 					
-					Inventory newStock2 = new Inventory();
+					AbstractInventory newStock2 = new Cart(inventory);
 					
 					
 
@@ -224,10 +224,10 @@ public class AddStock {
 					
 						
 					if (chckbxResetInv.isSelected()) {
-						inventory.setInventory(newStock2, user);
+						inventory.setInventory(newStock2, user.getCurrentUser());
 					}
 					else {
-						inventory.updateInventory(newStock2, user, false);
+						inventory.updateInventory(newStock2, user.getCurrentUser(), false);
 					}
 						
 					inventory.updateCSV();
@@ -236,7 +236,7 @@ public class AddStock {
 					frame.dispose();
 				}
 				else {
-					TextWindow.main(user, "Invalid password");
+					TextWindow.main(user.getCurrentUser(), "Invalid password");
 				}
 				
 				

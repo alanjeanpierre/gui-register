@@ -1,3 +1,4 @@
+package main;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -13,6 +14,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+/**
+ * All-in-one application for setup file
+ * Need to make it less... plain-texty
+ * @author Alan Jeanpierre
+ *
+ */
 public class Setup {
 
 	private JFrame frame;

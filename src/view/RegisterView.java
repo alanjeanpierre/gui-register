@@ -1,9 +1,22 @@
+package view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+
+import controller.AddStockController;
+import controller.ButtonController;
+import controller.PurchaseController;
+import controller.UsernameListener;
+import logger.Logger;
+import model.AbstractInventory;
+import model.Cart;
+import model.Inventory;
+import model.Item;
+import model.Users;
+
 import com.jgoodies.forms.layout.FormSpecs;
 import java.awt.Component;
 import javax.swing.Box;
@@ -33,7 +46,7 @@ import java.io.File;
  * @author jeanp
  *
  */
-public class Register {
+public class RegisterView {
 
 	private JFrame frmPartsBinRegister;
 	
@@ -47,55 +60,22 @@ public class Register {
 
 
 	private Inventory inventory;
+	private Cart testCart;
+	private Users users;
+	
+	
 	private JButton btnAddStock;
 	private JTextField txtUsername;
-	private Inventory testCart;
-	private ArrayList<Integer> users;
+	//private ArrayList<Integer> users;
 	private int password;
 	private String inventoryFile;
-	
+
 	
 
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Register window = new Register(args);
-					window.frmPartsBinRegister.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		
-	}
-	
-	/**
-	 * checks if username is in the list of auth'd users
-	 * @param username
-	 * @param users
-	 * @return
-	 */
-	private Boolean checkUser(String username, ArrayList<Integer> users) {
-		
-		int hashedName = username.hashCode();
-		for (int user : users) {
-			if (hashedName == user) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
 	/**
 	 * reprints the cart to the cart window
 	 */
-	private void updateCart() {
+	public void updateCart() {
 		
 		
 		txtTotal.setText(String.format("$%.2f",  testCart.getTotal()));
@@ -108,7 +88,7 @@ public class Register {
 	 * hovertext has name, price and quantity remaining (not counting
 	 * the amount in the current cart)
 	 */
-	private void updateHoverText() {
+	public void updateHoverText() {
 		
 		for (JButton i : btnItems) {
 			Item temp = inventory.getItem(i.getText());
@@ -117,68 +97,50 @@ public class Register {
 		}
 	}
 	
-	/**
-	 * adds item to cart based on name
-	 * @param name
-	 */
-	private void addToCart(String name) {
-		
-		Item temp = inventory.getItem(name);
-		temp.singleQuantity();
-		
-		testCart.addItem(temp);
-		
-		updateCart();
-	}
-/*
 
 	/**
 	 * Create the application.
 	 */
-	public Register(String[] args) {
+	public RegisterView(Inventory inventory, Cart cart, Users users) {
 		
-		testCart = new Inventory();
-		users = new ArrayList<>();
+		this.inventory = inventory;
+		this.testCart = cart;
+		this.users = users;
 		
-		Scanner scanner = null;
-		
-		try {
-		    scanner = new Scanner(new File("setup"));
-		} catch (Exception FileNotFoundException) {
-		    System.err.println("failed to open setup file, try running setup first");
-		    System.exit(1);
-		}
-		Scanner in = scanner.useDelimiter("[\\,\\n\\r]+");
-		
-		
-	   
-		password = in.nextInt();
-		if (args.length > 0) {
-			inventoryFile = args[0];
-			in.next();
-		}
-		else {
-			inventoryFile = in.next();
-		}
-
-		while (in.hasNext()) {
-			users.add(in.nextInt());		
-			
-		}
-		
-		in.close();
-		scanner.close();
-		
-		inventory = new Inventory(inventoryFile);
 		
 		
 		initialize();
 		updateHoverText();
-		Logger.startup();
+		frmPartsBinRegister.setVisible(true);
+	}
+	
+	/**
+	 * Register listeners and reverse register the register
+	 * @param b
+	 * @param s
+	 * @param purchase
+	 * @param ulist
+	 */
+	public void registerListeners(ButtonController b, AddStockController s, PurchaseController purchase, UsernameListener ulist) {
+		btnAddStock.addActionListener(s);
+		s.registerRegister(this);
+		for (JButton j : btnItems) {
+			j.addActionListener(b);
+			b.registerRegister(this);
+		}
+		
+		btnPurchase.addActionListener(purchase);
+		btnCancel.addActionListener(purchase);
+		purchase.registerRegister(this);
+		
+		txtUsername.addKeyListener(ulist);
+		txtUsername.addMouseListener(ulist);
+		ulist.registerRegister(this);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
+	 * I'll make it nicer later
 	 */
 	private void initialize() {
 		
@@ -194,6 +156,7 @@ public class Register {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				Logger.close();
+				System.exit(0);
 			}
 		});
 		frmPartsBinRegister.setTitle("Parts Bin Register");
@@ -209,14 +172,7 @@ public class Register {
 		
 		btnItems = new JButton[num];		
 		for (int i = 0; i < num; i++) {
-			final int iFinal = i; // bizarre that I need to do this...
 			btnItems[i] = new JButton(inventory.getItemName(i));
-			btnItems[i].addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					addToCart(btnItems[iFinal].getText());
-				}
-			});
 		}
 
 		int x = 0, y = 0, i = 0;;
@@ -242,21 +198,6 @@ public class Register {
 		
 		
 		btnAddStock = new JButton("Add Stock");
-		btnAddStock.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-
-				if (checkUser(txtUsername.getText(), users)) {
-					testCart.clear();
-					updateCart();
-					
-					AddStock.main(inventory, txtUsername.getText(), password);
-				}
-				else {
-					TextWindow.main(txtUsername.getText(), "Error: Invalid User");
-				}
-			}
-		});
 		GridBagConstraints gbc_btnAddStock = new GridBagConstraints();
 		gbc_btnAddStock.insets = new Insets(0, 0, 5, 5);
 		gbc_btnAddStock.gridx = 0;
@@ -264,12 +205,6 @@ public class Register {
 		frmPartsBinRegister.getContentPane().add(btnAddStock, gbc_btnAddStock);
 		
 		txtUsername = new JTextField();
-		txtUsername.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				txtUsername.setText("");
-			}
-		});
 		txtUsername.setText("username");
 		GridBagConstraints gbc_txtUsername = new GridBagConstraints();
 		gbc_txtUsername.fill = GridBagConstraints.HORIZONTAL;
@@ -290,14 +225,6 @@ public class Register {
 		txtTotal.setColumns(10);
 		
 		btnCancel = new JButton("Cancel");
-		btnCancel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-				testCart.clear();
-				updateCart();
-			}
-		});
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
 		gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
 		gbc_btnCancel.gridx = 0;
@@ -305,31 +232,6 @@ public class Register {
 		frmPartsBinRegister.getContentPane().add(btnCancel, gbc_btnCancel);
 		
 		btnPurchase = new JButton("Purchase");
-		btnPurchase.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (checkUser(txtUsername.getText(), users)) {
-					
-					Item c = inventory.checkCart(testCart);
-					
-					if (c != null) {
-						TextWindow.main(txtUsername.getText(), String.format("Error: not enough stock for %s", c.getName()));
-						return;
-					}
-					
-					
-					inventory.updateInventory(testCart, txtUsername.getText(), true);
-					testCart.clear();
-					updateCart();
-					inventory.updateCSV();
-					updateHoverText();
-				}
-				else {
-					TextWindow.main(txtUsername.getText(), "Error: Invalid User");
-				}
-				
-			}
-		});
 		GridBagConstraints gbc_btnPurchase = new GridBagConstraints();
 		gbc_btnPurchase.insets = new Insets(0, 0, 0, 5);
 		gbc_btnPurchase.gridx = 2;
@@ -346,6 +248,23 @@ public class Register {
 		gbc_txtrCart.gridy = 11;
 		gridBagLayout.columnWeights[x+1] = 1.0;
 		frmPartsBinRegister.getContentPane().add(txtrCart, gbc_txtrCart);
+	}
+
+	/**
+	 * gets username from username box
+	 * @return
+	 */
+	public String getUser() {
+		return txtUsername.getText();
+	}
+
+	/**
+	 * Clears username (used on click)
+	 */
+	public void clearUsername() {
+		// TODO Auto-generated method stub
+		txtUsername.setText("");
+		
 	}
 
 }

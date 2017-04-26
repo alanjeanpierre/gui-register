@@ -1,5 +1,11 @@
+package model;
 import java.math.BigDecimal;
 
+/**
+ * Item class holds name, price, and quantity information
+ * @author Alan Jeanpierre
+ *
+ */
 public class Item {
 
 	private int quantity;
@@ -40,6 +46,9 @@ public class Item {
 		return name;
 	}
 	
+	/**
+	 * Sets quantity to one, useful for cloning
+	 */
 	public void singleQuantity(){
 		quantity = 1;
 	}
@@ -50,6 +59,10 @@ public class Item {
 	
 	public void addQuantity(int newStock) {
 		quantity += newStock;
+	}
+	
+	public void setQuantity(int newStock) {
+		quantity = newStock;
 	}
 	
 }

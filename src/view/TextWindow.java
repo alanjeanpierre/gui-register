@@ -1,3 +1,4 @@
+package view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -11,6 +12,8 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.SwingConstants;
+
+import logger.Logger;
 /**
  * Creates a text window with a supplied message
  * @author jeanp
