@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.time.*;
 
 import model.Item;
@@ -131,6 +132,26 @@ public class Logger {
 		    System.err.println("failed to open log file");
 		    System.exit(1);
 		}
+	}
+	
+	/**
+	 * logs new connection to server
+	 */
+	public static void connect(InetAddress address) {
+		
+		try{
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
+		    
+		    //date, time, (user), function
+		    writer.format("%s,%s,,CONNECT,%s\n", 
+		    		LocalDate.now(), LocalTime.now(), address.toString());
+
+		    writer.close();
+		} catch (IOException e) {
+		    System.err.println("failed to open log file");
+		    System.exit(1);
+		}
+		
 	}
 	
 	/**

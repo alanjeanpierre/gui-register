@@ -65,4 +65,8 @@ public class Item {
 		quantity = newStock;
 	}
 	
+	public String apiString() {
+		return name + "|" + Integer.toString(quantity) + "|" + price.toPlainString();
+	}
+	
 }

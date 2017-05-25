@@ -11,9 +11,9 @@ import java.util.HashMap;
  */
 public class Cart extends AbstractInventory {
 	
-	private Inventory inventory;
+	private AbstractInventory inventory;
 
-	public Cart(Inventory inventory) {
+	public Cart(AbstractInventory inventory) {
 		this.inventory = inventory;
 		item2 = new HashMap<>();
 		itemNames = new ArrayList<>();

@@ -22,6 +22,14 @@ public class Users {
 		
 	}
 
+	public boolean isEmpty() {
+		return users.isEmpty();
+	}
+	
+	public void add(String user) {
+		users.add(user);
+	}
+	
 	public void add(int nextInt) {
 		// TODO Auto-generated method stub
 		
@@ -61,6 +69,20 @@ public class Users {
 	public String getCurrentUser() {
 		// TODO Auto-generated method stub
 		return currentUser;
+	}
+
+	public boolean checkUser(String user) {
+		
+		if (user == null) return false;
+		
+		for (String u : users) {
+			
+			if (user.equals(u)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }
