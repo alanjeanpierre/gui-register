@@ -4,6 +4,7 @@ import java.io.File;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalTime;
 import java.util.*;
 
 import logger.Logger;
@@ -19,7 +20,7 @@ public abstract class AbstractInventory {
 
 	protected HashMap<String, Item> item2;
 	protected ArrayList<String> itemNames;
-	private String file;
+	private LocalTime lastUpdate;
 	
 	/**
 	 * adds item of single quantity to inventory
@@ -103,6 +104,35 @@ public abstract class AbstractInventory {
 	}
 	
 
+	public String getAPIInventory() {
+		StringBuilder s = new StringBuilder();
+
+		s.append(lastUpdate.toString() + "|");
+		for (Item i : item2.values()) {
+			s.append(i.apiString() + "&");
+		}
+		
+		
+		
+		return s.toString();
+	}
+
+	protected void updateTime() {
+		// TODO Auto-generated method stub
+		lastUpdate = LocalTime.now();
+		
+	}
 	
+	public void updateTime(String t) {
+		lastUpdate = LocalTime.parse(t);
+	}
+	
+	public String getTime() {
+		return lastUpdate.toString();
+	}
+	
+	public boolean checkCurrent(LocalTime timestamp) {
+		return lastUpdate.equals(timestamp);
+	}
 	
 }

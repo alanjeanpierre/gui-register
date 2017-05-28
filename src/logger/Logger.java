@@ -3,6 +3,7 @@ package logger;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.time.*;
@@ -19,7 +20,6 @@ import model.Item;
 public class Logger {
 
 	private static final String log = "log.csv";
-	private static double sales = 0;
 	
 	
 	/**
@@ -57,8 +57,6 @@ public class Logger {
 		    		LocalDate.now(), LocalTime.now(),
 		    		user, item.getName(), item.getQuant(), item.getPrice(), sale);
 		    
-		    sales += sale;
-
 		    writer.close();
 		} catch (IOException e) {
 		    System.err.println("failed to open log file");
@@ -113,11 +111,13 @@ public class Logger {
 		}
 	}
 	
+	
 	/**
 	 * logs any popups and their messages
 	 * @param user
 	 * @param message
 	 */
+	/*
 	public static void popup(String user, String message) {
 		
 		try{
@@ -133,7 +133,7 @@ public class Logger {
 		    System.exit(1);
 		}
 	}
-	
+	*/
 	/**
 	 * logs new connection to server
 	 */
@@ -162,13 +162,31 @@ public class Logger {
 		try{
 		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
 		    
+		    /*
 		    writer.format("%s,%s,,TOTAL,%.2f\n",
 		    		LocalDate.now(), LocalTime.now(),
 		    		sales);
-		    
+		    */
 		    //date, time, (user), function
 		    writer.format("%s,%s,,CLOSE,\n", 
 		    		LocalDate.now(), LocalTime.now());
+
+		    writer.close();
+		} catch (IOException e) {
+		    System.err.println("failed to open log file");
+		    System.exit(1);
+		}
+	}
+
+	public static void code(int code, String request, InetAddress inetAddress) {
+		// TODO Auto-generated method stub
+
+		try{
+		    PrintWriter writer = new PrintWriter(new FileOutputStream(new File("./logs/" + LocalDate.now()+"-"+log),true));
+		    
+		    //date, user, item, quantity, price, total
+		    writer.format("%s,%s,%s,Code,%s,%s\n", 
+		    		LocalDate.now(), LocalTime.now(), inetAddress.toString(), code, request);
 
 		    writer.close();
 		} catch (IOException e) {

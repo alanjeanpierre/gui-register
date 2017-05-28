@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import view.*;
 import model.*;
+import server.Client;
 
 /**
  * Controls the add stock button. Checks for a valid user, then 
@@ -15,20 +16,18 @@ import model.*;
  */
 public class AddStockController implements ActionListener {
 	
-	private Users users;
-	private Inventory inventory;
+	private Client client;
+	private ClientInventory inventory;
 	private Cart cart;
 	private RegisterView register;
-	private Password password;
 	
 
 	
-	public AddStockController(Users users, Inventory inventory, Cart cart, Password password) {
+	public AddStockController(ClientInventory inventory2, Cart cart, Client client) {
 		// TODO Auto-generated constructor stub
-		this.users = users;
-		this.inventory = inventory;
+		this.inventory = inventory2;
 		this.cart = cart;
-		this.password = password;
+		this.client = client;
 	}
 	
 	/**
@@ -46,7 +45,7 @@ public class AddStockController implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		if (users.checkUser()) {
+		if (client.auth(register.getUser())) {
 			cart.clear();
 			register.updateCart();
 			
@@ -54,7 +53,7 @@ public class AddStockController implements ActionListener {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-						AddStock window = new AddStock(inventory, users, password);
+						AddStock window = new AddStock(inventory, register.getUser(), client);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -62,7 +61,7 @@ public class AddStockController implements ActionListener {
 			});
 		}
 		else {
-			TextWindow.main(users.getCurrentUser(), "Error: Invalid User");
+			TextWindow.main(register.getUser(), "Error: Invalid User");
 		}
 		
 	}

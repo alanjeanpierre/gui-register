@@ -7,31 +7,43 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class ClientTest {
 
 	PrintWriter out;
 	BufferedReader in;
-	Socket server;
 	
 	public static void main(String args[]) {
 		String hostname = args[0];
 		int port = Integer.parseInt(args[1]);
-		new Client(hostname, port);
+		new ClientTest(hostname, port);
 	}
 	
 	
-	public Client(String hostname, int port) {
+	public ClientTest(String hostname, int port) {
 		
 		try {
-			server = new Socket(hostname, port);
+			Socket server = new Socket(hostname, port);
 			out = new PrintWriter(server.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(server.getInputStream()));
-			in.readLine();
 			
+			String fromServer;
+			String fromUser;
+			Scanner input = new Scanner(System.in);
+			
+			
+			while ((fromServer = in.readLine()) != null) {
+				System.out.println("Server: " + fromServer);
+				if (fromServer.equals("Bye.")) break;
+
+				fromUser = input.nextLine();
+				if (fromUser != null) {
+					System.out.println("User: " + fromUser);
+					out.println(fromUser);
+				}
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			System.exit(-1);
 		}
 	}
 	
@@ -52,19 +64,6 @@ public class Client {
 		}
 		catch (IOException e) {
 			return null;
-		}
-	}
-
-
-	public boolean auth(String user) {
-		out.println("auth|" + user);
-		int returnCode;
-		try {
-			returnCode = Integer.parseInt(in.readLine());
-			return returnCode == 200;
-		}
-		catch (IOException e) {
-			return false;
 		}
 	}
 }

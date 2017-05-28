@@ -4,9 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import model.Cart;
+import model.ClientInventory;
 import model.Inventory;
 import model.Item;
 import model.Users;
+import server.Client;
 import view.RegisterView;
 import view.TextWindow;
 
@@ -17,15 +19,15 @@ import view.TextWindow;
  */
 public class PurchaseController implements ActionListener {
 
-	private Users users;
-	private Inventory inventory;
+	private ClientInventory inventory;
 	private Cart cart;
 	private RegisterView register;
+	private Client client;
 	
-	public PurchaseController(Users users, Inventory inventory, Cart cart) {
-		this.users = users;
+	public PurchaseController(ClientInventory inventory, Cart cart, Client client) {
 		this.inventory = inventory;
 		this.cart = cart;
+		this.client = client;
 	}
 
 	/**
@@ -51,25 +53,31 @@ public class PurchaseController implements ActionListener {
 			return;
 		}
 		
-		if (users.checkUser()) {
+		if (client.auth(register.getUser())) {
 			
-			Item c = inventory.checkCart(cart);
 			
-			if (c != null) {
-				TextWindow.main(users.getCurrentUser(), String.format("Error: not enough stock for %s", c.getName()));
+			cart.updateTime(inventory.getTime());
+			int response = client.write("buy|" + register.getUser() + "|_|" + cart.getAPIInventory());
+
+			inventory.updateInventory(client.getinv());
+			if (response == 502) {
+				// not up to date;
 				return;
 			}
+			if (response == 402) {
+				// not enough stock;
+				TextWindow.main(register.getUser(), "Not enough stock");
+			}
+
+			//inventory.updateInventory(cart, register.getUser(), true, false);
 			
-			
-			inventory.updateInventory(cart, users.getCurrentUser(), true);
 			cart.clear();
 			register.updateCart();
-			inventory.updateCSV();
 			register.updateHoverText();
 			//open drawer
 		}
 		else {
-			TextWindow.main(users.getCurrentUser(), "Error: Invalid User");
+			TextWindow.main(register.getUser(), "Error: Invalid User");
 		}
 		
 	}

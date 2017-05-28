@@ -8,10 +8,12 @@ import javax.swing.JTextField;
 
 import model.AbstractInventory;
 import model.Cart;
+import model.ClientInventory;
 import model.Inventory;
 import model.Item;
 import model.Password;
 import model.Users;
+import server.Client;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -36,7 +38,7 @@ public class AddStock {
 	private JFrame frame;
 	private JPasswordField pwdPassword;
 	
-	private Inventory inventory;
+	private ClientInventory inventory;
 	
 	private JLabel lblReset;
 	private JCheckBox chckbxResetInv;
@@ -48,18 +50,17 @@ public class AddStock {
 	private GridBagConstraints nameConstraints[];
 	private GridBagConstraints quantConstraints[];
 	
-	private Users user;
-	private Password password;
-
+	private String user;
+	private Client client;
 	
 
 	/**
 	 * Create the application.
 	 */
-	public AddStock(AbstractInventory inventory, Users users, Password password) {
-		this.password = password;
-		this.user = users;
-		this.inventory = (Inventory) inventory;
+	public AddStock(ClientInventory inventory, String user, Client client) {
+		this.user = user;
+		this.client = client;
+		this.inventory = inventory;
 		initialize();
 		frame.setVisible(true);
 	}
@@ -201,44 +202,43 @@ public class AddStock {
 				
 				int inPwd = String.valueOf(pwdPassword.getPassword()).hashCode();
 				
-				if (password.valid(pwdPassword.getPassword())) {
-					
-					AbstractInventory newStock2 = new Cart(inventory);
-					
-					
+				
+				Cart newStock2 = new Cart(inventory);
+				
+				
 
-					for (int i = 0; i < quantities.length; i++) {
-						
-						int quant;
-						
-						if (chckbxResetInv.isSelected()) {
-							quant = Integer.parseInt(quantities[i].getText());
-						}
-						else {
-							quant = -Integer.parseInt(quantities[i].getText());
-						}
-						double price = Double.parseDouble(prices[i].getText());
-						newStock2.addItem(new Item(quant, price, names[i].getText()));
-					}
-
+				for (int i = 0; i < quantities.length; i++) {
 					
-						
+					int quant;
+					
 					if (chckbxResetInv.isSelected()) {
-						inventory.setInventory(newStock2, user.getCurrentUser());
+						quant = Integer.parseInt(quantities[i].getText());
 					}
 					else {
-						inventory.updateInventory(newStock2, user.getCurrentUser(), false);
+						quant = -Integer.parseInt(quantities[i].getText());
 					}
-						
-					inventory.updateCSV();
+					double price = Double.parseDouble(prices[i].getText());
+					newStock2.addItem(new Item(quant, price, names[i].getText()));
+				}
+
+				
+				int response;
 					
+				if (chckbxResetInv.isSelected()) {
+					response = client.write("setstock|" + user + "|" + String.valueOf(pwdPassword.getPassword()) + "|" + inventory.getTime() + "|" + newStock2.getAPIInventory());
 					
-					frame.dispose();
 				}
 				else {
-					TextWindow.main(user.getCurrentUser(), "Invalid password");
+					response = client.write("addstock|" + user + "|" + String.valueOf(pwdPassword.getPassword()) + "|" + inventory.getTime() + "|" + newStock2.getAPIInventory());
+					
+				}
+					
+				if (response != 200) {
+					TextWindow.main(user, response);
 				}
 				
+				
+				frame.dispose();
 				
 			}
 		});

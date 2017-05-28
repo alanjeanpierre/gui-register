@@ -14,14 +14,12 @@ import view.RegisterView;
  * @author Alan Jeanpierre
  *
  */
-public class UsernameListener implements MouseListener, KeyListener{
+public class UsernameListener implements MouseListener{
 
-	private Users users;
 	private RegisterView register;
 	
-	public UsernameListener(Users users) {
+	public UsernameListener() {
 		// TODO Auto-generated constructor stub
-		this.users = users;
 	}
 
 	/**
@@ -30,26 +28,6 @@ public class UsernameListener implements MouseListener, KeyListener{
 	 */
 	public void registerRegister(RegisterView register) {
 		this.register = register;
-	}
-
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		users.setCurrentUser(register.getUser());
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

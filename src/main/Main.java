@@ -8,10 +8,12 @@ import java.util.Scanner;
 import logger.Logger;
 
 import model.Cart;
+import model.ClientInventory;
 import model.Inventory;
 import model.Password;
 import model.AbstractInventory;
 import model.Users;
+import server.Client;
 import view.AddStock;
 import view.RegisterView;
 import controller.*;
@@ -31,56 +33,25 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		String inventoryFile;
-		
-		Users users = new Users();
-		
-		
-		Scanner scanner = null;
-		
-		try {
-		    scanner = new Scanner(new File("setup"));
-		} catch (Exception FileNotFoundException) {
-		    System.err.println("failed to open setup file, try running setup first");
-		    System.exit(1);
-		}
-		Scanner in = scanner.useDelimiter("[\\,\\n\\r]+");
-		
-		
-	   
-		int password = in.nextInt();
-		if (args.length > 0) {
-			inventoryFile = args[0];
-			in.next();
-		}
-		else {
-			inventoryFile = in.next();
-		}
 
-		while (in.hasNext()) {
-			users.add(in.nextInt());		
-			
-		}
+		Client client = new Client(args[0], Integer.parseInt(args[1]));
 		
-		in.close();
-		scanner.close();
+		ClientInventory inventory = new ClientInventory(client.getinv());
 		
-		Inventory inventory = new Inventory(inventoryFile);
-
 		Cart cart = new Cart(inventory);
 		
 		Password p = new Password();
 		
-		AddStockController stock = new AddStockController(users, inventory, cart, p);
-		ButtonController btn = new ButtonController(inventory, cart);
-		PurchaseController purchase = new PurchaseController(users, inventory, cart);
-		UsernameListener ulist = new UsernameListener(users);
+		AddStockController stock = new AddStockController(inventory, cart, client);
+		ButtonController btn = new ButtonController(inventory, cart, client);
+		PurchaseController purchase = new PurchaseController(inventory, cart, client);
+		UsernameListener ulist = new UsernameListener();
 		
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					RegisterView window = new RegisterView(inventory, cart, users);	
+					RegisterView window = new RegisterView(inventory, cart);	
 					window.registerListeners(btn, stock, purchase, ulist);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -89,7 +60,6 @@ public class Main {
 		});
 
 		
-		Logger.startup();
 		
 	}
 

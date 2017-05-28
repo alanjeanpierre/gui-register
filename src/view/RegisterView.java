@@ -13,6 +13,7 @@ import controller.UsernameListener;
 import logger.Logger;
 import model.AbstractInventory;
 import model.Cart;
+import model.ClientInventory;
 import model.Inventory;
 import model.Item;
 import model.Users;
@@ -59,16 +60,12 @@ public class RegisterView {
 	private GridBagConstraints buttonConstraints[];
 
 
-	private Inventory inventory;
+	private ClientInventory inventory;
 	private Cart testCart;
-	private Users users;
 	
 	
 	private JButton btnAddStock;
 	private JTextField txtUsername;
-	//private ArrayList<Integer> users;
-	private int password;
-	private String inventoryFile;
 
 	
 
@@ -101,11 +98,10 @@ public class RegisterView {
 	/**
 	 * Create the application.
 	 */
-	public RegisterView(Inventory inventory, Cart cart, Users users) {
+	public RegisterView(ClientInventory inventory2, Cart cart) {
 		
-		this.inventory = inventory;
+		this.inventory = inventory2;
 		this.testCart = cart;
-		this.users = users;
 		
 		
 		
@@ -133,7 +129,6 @@ public class RegisterView {
 		btnCancel.addActionListener(purchase);
 		purchase.registerRegister(this);
 		
-		txtUsername.addKeyListener(ulist);
 		txtUsername.addMouseListener(ulist);
 		ulist.registerRegister(this);
 	}
@@ -155,7 +150,7 @@ public class RegisterView {
 			}
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				Logger.close();
+				//Logger.close();
 				System.exit(0);
 			}
 		});

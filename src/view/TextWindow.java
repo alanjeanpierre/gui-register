@@ -46,7 +46,7 @@ public class TextWindow {
 	 */
 	public TextWindow(String user, String message) {
 		this.message = message;
-		Logger.popup(user, message);
+		//Logger.popup(user, message);
 		initialize();
 	}
 
@@ -71,6 +71,32 @@ public class TextWindow {
 			}
 		});
 		frame.getContentPane().add(btnOk, BorderLayout.SOUTH);
+	}
+
+	public static void main(String user, int response) {
+		
+		String message = "yo";
+		
+		switch(response) {
+		case 400: message = "Invalid request"; break;
+		case 401: message = "Invalid credentials"; break;
+		case 402: message = "Invalid stock"; break;
+		case 501: message = "Not implemented"; break;
+		case 403: message = "real bad son"; break;
+		}
+		
+		final String m1 = message;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					TextWindow window = new TextWindow(user, m1);
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 	}
 
 }

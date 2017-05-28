@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 
 import logger.Logger;
 import model.Password;
@@ -35,11 +36,16 @@ public class Server {
 			while (true) {
 				Connection client = new Connection(serverSocket.accept(), inventory, users, password);
 				new Thread(client).start();
+				
 			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+			Logger.close();
 		}
+		
+		Logger.close();
+		
 		
 	}
 }

@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -26,6 +28,7 @@ public class Connection implements Runnable {
 	private ServerInventory inventory;
 	private Users users;
 	private Password password;
+	private String request;
 	
 	@Override
 	public void run() {
@@ -34,8 +37,9 @@ public class Connection implements Runnable {
 			out = new PrintWriter(client.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			
-			out.println("You're in");
 			Logger.connect(client.getInetAddress());
+			
+			out.println("You're in, " + client.getInetAddress());
 
 			String input;
 			while ((input = in.readLine()) != null) {
@@ -44,16 +48,26 @@ public class Connection implements Runnable {
 			}
 
 		}
-		catch (IOException e) {
-			e.printStackTrace();
+		catch (SocketException e) {
 			try {
 				client.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			}
+			return;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			try {
+				client.close();
+				return;
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return;
 				// shits real bad if we're here
 			}
-			System.exit(-1);
 		}
 		
 	}
@@ -62,11 +76,11 @@ public class Connection implements Runnable {
 	 * lets design that api
 	 * delimted by |
 	 * keywords:
-	 * 		addstock	-- adds an item			addstock|user|password|item|num
+	 * 		addstock	-- adds an item			addstock|user|password|timestamp|item|num&item|num
 	 * 		* 						
 	 * 		adduser		-- adds a user			adduser|user|password|newuser
 	 * 			
-	 * 		buy			-- buys item			buy|user|timestamp|item|quant&item|...
+	 * 		buy			-- buys item			buy|user|timestamp|item|quant&item|quant&item|quant&...
 	 * 
 	 * 		setstock	-- sets item			setstock|user|password|item|num
 	 * 
@@ -78,6 +92,9 @@ public class Connection implements Runnable {
 	 * 
 	 * 		update		-- checks for updates	update|timestamp
 	 * 					returns "up to date" or "not up to date"
+	 * 
+	 * 		auth		-- checks for user 		auth|username
+	 * 					returns 200 ok, 401 bad auth
 	 * 		
 	 * 
 	 * 		return codes
@@ -86,15 +103,18 @@ public class Connection implements Runnable {
 	 * 			401		-- bad auth
 	 * 			402		-- invalid stock
 	 * 			501 	-- Not implemnted yet
+	 * 			502		-- Not current
 	 *		
 	 * @param input
 	 * @param out 
 	 */
 	private void processInput(String input) {
-		Scanner parser = new Scanner(input).useDelimiter("\\|");
+		Scanner parser = new Scanner(input).useDelimiter("\\||&");
+		
+		request = input;
 		
 		if (!parser.hasNext()) {
-			out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+			writeCode(Server.REQUEST_ERROR_CODE);
 			return;
 		}
 		
@@ -106,19 +126,37 @@ public class Connection implements Runnable {
 		
 		switch(op) {
 			case "addstock":
+			case "buy":
+			case "setstock":
+				Cart cart = new Cart(inventory);
+				LocalTime timestamp;
 				try {
 					user = parser.next();
 					pass = parser.next();
-					item = parser.next();
-					num = parser.nextInt();
+					try {
+						timestamp = LocalTime.parse(parser.next());
+					}
+					catch(DateTimeParseException e) {
+						timestamp = null;
+					}
+					while (parser.hasNext()) {
+						item = parser.next();
+						num = parser.nextInt();
+						price = parser.nextDouble();
+						Item tmp = new Item(inventory.getItem(item));
+						tmp.setQuantity(num);
+						cart.addItem(tmp);
+					}
 				}
 				catch (NoSuchElementException e) {
-					out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+
+					//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					writeCode(Server.REQUEST_ERROR_CODE);
 					return;
 				}
-				temp = new Item(inventory.getItem(item));
-				temp.setQuantity(num);
-				addStock(temp, user, pass);
+				
+				buy(cart, user, pass, timestamp, op);
+				inventory.updateCSV();
 				break;
 				
 			case "adduser":
@@ -128,48 +166,11 @@ public class Connection implements Runnable {
 					newUser = parser.next();
 				}
 				catch (NoSuchElementException e) {
-					out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					writeCode(Server.REQUEST_ERROR_CODE);
 					return;
 				}
 				addUser(user, pass, newUser);
-				break;
-				
-			case "buy":
-				Cart cart = new Cart(inventory);
-				LocalTime timestamp;
-				try {
-					user = parser.next();
-					timestamp = LocalTime.parse(parser.next());
-					while (parser.hasNext()) {
-						item = parser.next();
-						num = parser.nextInt();
-						Item tmp = new Item(inventory.getItem(item));
-						tmp.setQuantity(num);
-						cart.addItem(tmp);
-					}
-				}
-				catch (NoSuchElementException e) {
-					out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
-					return;
-				}
-				
-				buy(cart, user, timestamp);
-				break;
-				
-			case "setstock":
-				try {
-					user = parser.next();
-					pass = parser.next();
-					item = parser.next();
-					num = parser.nextInt();
-				}
-				catch (NoSuchElementException e) {
-					out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
-					return;
-				}
-				temp = new Item(inventory.getItem(item));
-				temp.setQuantity(num);
-				setStock(temp, user, pass);
 				break;
 				
 			case "setprice":
@@ -180,7 +181,8 @@ public class Connection implements Runnable {
 					price = parser.nextDouble();
 				}
 				catch (NoSuchElementException e) {
-					out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					writeCode(Server.REQUEST_ERROR_CODE);
 					return;
 				}
 				temp = inventory.getItem(item);
@@ -194,9 +196,26 @@ public class Connection implements Runnable {
 			case "update":
 				update();
 				break;
-				
+			case "auth":
+				try {
+					user = parser.next();
+					if (users.checkUser(user) ) {
+						//out.println(Integer.toString(Server.OK_CODE));
+						writeCode(Server.OK_CODE);
+					}
+					else {
+						//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+						writeCode(Server.AUTH_ERROR_CODE);
+					}
+						
+				} catch (NoSuchElementException  e) {
+					//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					writeCode(Server.REQUEST_ERROR_CODE);
+				}
+				break;
 			default:	// bad request
-				out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+				//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+				writeCode(Server.REQUEST_ERROR_CODE);
 				return;
 		}
 		
@@ -207,7 +226,8 @@ public class Connection implements Runnable {
 
 	private void update() {
 		// TODO Auto-generated method stub
-		out.println(Integer.toString(Server.NOT_IMPLEMENTED_CODE));
+		//out.println(Integer.toString(Server.NOT_IMPLEMENTED_CODE));
+		writeCode(Server.NOT_IMPLEMENTED_CODE);
 	}
 
 	private void getinv() {
@@ -218,34 +238,61 @@ public class Connection implements Runnable {
 		
 		if (password.checkPassword(pass) && users.checkUser(user)) {
 			inventory.updateInventory(item, user, false, true);
-			out.println(Integer.toString(Server.OK_CODE));
+			//out.println(Integer.toString(Server.OK_CODE));
+			writeCode(Server.OK_CODE);
 		}
 		else {
-			out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			writeCode(Server.AUTH_ERROR_CODE);
 		}
 		
 		
 	}
 
-	private void buy(Cart cart, String user, LocalTime timestamp) {
+	private void buy(Cart cart, String user, String pass, LocalTime timestamp, String op) {
 
 		if (users.checkUser(user)) {
 			
 			if (!inventory.checkCurrent(timestamp)) {
-				out.println(Integer.toString(Server.NOT_CURRENT));
+				//out.println(Integer.toString(Server.NOT_CURRENT));
+				writeCode(Server.NOT_CURRENT);
 				return;
 			}
 			
-			if (inventory.checkCart(cart) != null) {
-				out.println(Integer.toString(Server.NOT_ENOUGH_STOCK));
-				return;
+			boolean buy = false, stock = false;
+			switch(op) {
+				case "buy":
+					if (inventory.checkCart(cart) != null) {
+						//out.println(Integer.toString(Server.NOT_ENOUGH_STOCK));
+						writeCode(Server.NOT_ENOUGH_STOCK);
+						return;
+					}
+					buy = true;
+					stock = false;
+					break;
+				case "setstock":
+					stock = true;
+				case "addstock":
+					if (!password.checkPassword(pass)) {
+
+						//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+						writeCode(Server.AUTH_ERROR_CODE);
+						return;
+					}
+					break;
+				default:
+					//out.println(Integer.toString(Server.REQUEST_ERROR_CODE));
+					writeCode(Server.REQUEST_ERROR_CODE);
+					return;
 			}
 			
-			inventory.updateInventory(cart, user, false, false);
-			out.println(Integer.toString(Server.OK_CODE));
+			inventory.updateInventory(cart, user, buy, stock);
+			//out.println(Integer.toString(Server.OK_CODE));
+			writeCode(Server.OK_CODE);
 		}
 		else {
-			out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			writeCode(Server.AUTH_ERROR_CODE);
 		}
 		
 	}
@@ -254,10 +301,12 @@ public class Connection implements Runnable {
 		
 		if (password.checkPassword(pass) && (users.checkUser(user) || users.isEmpty() ) ) {
 			users.add(newUser);
-			out.println(Integer.toString(Server.OK_CODE));
+			//out.println(Integer.toString(Server.OK_CODE));
+			writeCode(Server.OK_CODE);
 		}
 		else {
-			out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			writeCode(Server.AUTH_ERROR_CODE);
 		}
 		
 	}
@@ -266,10 +315,12 @@ public class Connection implements Runnable {
 
 		if (password.checkPassword(pass) && users.checkUser(user)) {
 			inventory.updateInventory(item, user, false, false);
-			out.println(Integer.toString(Server.OK_CODE));
+			//out.println(Integer.toString(Server.OK_CODE));
+			writeCode(Server.OK_CODE);
 		}
 		else {
-			out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			//out.println(Integer.toString(Server.AUTH_ERROR_CODE));
+			writeCode(Server.AUTH_ERROR_CODE);
 		}
 		
 	}
@@ -279,6 +330,13 @@ public class Connection implements Runnable {
 		this.inventory = inventory2;
 		this.users = users;
 		this.password = password;
+	}
+	
+	private void writeCode(int code) {
+		if (code != 200) {
+			Logger.code(code, request, client.getInetAddress());
+		}
+		out.println(Integer.toString(code));
 	}
 
 }

@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +16,7 @@ public class Cart extends AbstractInventory {
 
 	public Cart(AbstractInventory inventory) {
 		this.inventory = inventory;
+		updateTime(inventory.getTime());
 		item2 = new HashMap<>();
 		itemNames = new ArrayList<>();
 	}
