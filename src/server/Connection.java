@@ -101,9 +101,10 @@ public class Connection implements Runnable {
 	 * 			200		-- ok
 	 * 			400		-- bad request
 	 * 			401		-- bad auth
-	 * 			402		-- invalid stock
+	 * 			402		-- Not enough stock
 	 * 			501 	-- Not implemnted yet
 	 * 			502		-- Not current
+	 * 			503		-- Invalid item
 	 *		
 	 * @param input
 	 * @param out 
@@ -140,9 +141,16 @@ public class Connection implements Runnable {
 						timestamp = null;
 					}
 					while (parser.hasNext()) {
+						// loop builds a cart
 						item = parser.next();
 						num = parser.nextInt();
 						price = parser.nextDouble();
+						Item base = inventory.getItem(item);
+						// if user enters nonexistant item
+						if (base == null) {
+							writeCode(Server.NO_SUCH_ITEM);
+							return;
+						}
 						Item tmp = new Item(inventory.getItem(item));
 						tmp.setQuantity(num);
 						cart.addItem(tmp);

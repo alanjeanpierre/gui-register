@@ -16,7 +16,8 @@ public class Server {
 	public static final int OK_CODE = 200;
 	public static final int NOT_IMPLEMENTED_CODE = 501;
 	public static final int NOT_ENOUGH_STOCK = 402;
-	public static final int NOT_CURRENT = 502; 
+	public static final int NOT_CURRENT = 502;
+	public static final int NO_SUCH_ITEM = 503; 
 
 	public static void main(String args[]) {
 		int port = Integer.parseInt(args[0]);

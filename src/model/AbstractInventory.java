@@ -63,6 +63,7 @@ public abstract class AbstractInventory {
 	 * @return
 	 */
 	public Item getItem(String name) {
+		if (item2.get(name) == null) return null;
 		return new Item(item2.get(name));
 		
 	}

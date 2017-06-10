@@ -1,11 +1,11 @@
 Inventory,,
 name,price,quantity
 Water,0.75,40
-Sprite,1.0,12
-Burritos,1.5,9
-Chips,1.0,50
-Coke,1.0,12
-Fanta,1.0,11
+Sprite,1.0,1
+Burritos,1.5,5
+Chips,1.0,48
+Coke,1.0,10
+Fanta,1.0,8
 Crackers,0.75,36
 Mexican Coke,1.5,21
 Snickers,1.25,24
